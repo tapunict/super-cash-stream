@@ -16,7 +16,7 @@ Each cash register sends events in real time with the following fields:
 
 Example event:
 ```json
-{  "timestamp": "2025-10-30T22:55:53Z",  "shop_id": "S123",  "order_id": "O98765",  "product_id": "P456",  "quantity": 2,  "price": 4.99}
+{ "shop_id": "S123",  "order_id": "O98765",  "product_id": "P456",  "quantity": 2,  "price": 4.99}
 ```
 
 2. Ingestion System
@@ -43,3 +43,18 @@ flowchart LR
 Bonus
 
 Add a ksqlDB query to perform the same aggregation using SQL-like syntax.
+ 
+
+To Add
+docker run -it -v super-cash-stream_super-cash-stream_data:/data ubuntu
+
+cd /data
+echo '{ "shop_id": "S123",  "order_id": "O98765",  "product_id": "P456",  "quantity": 2,  "price": 4.99}' >> pvtest.jsonl
+
+To create sql
+docker exec -it ksqldb-cli ksql http://ksqldb-server:8088
+
+CREATE STREAM cashflow_stream (timestamp DOUBLE, shop_id VARCHAR, order_id VARCHAR, product_id VARCHAR, quantity INT, price DOUBLE) WITH (KAFKA_TOPIC='cashflow', KEY_FORMAT='KAFKA', VALUE_FORMAT='JSON')
+
+SELECT product_id, quantity, price, (price * quantity) as revenue FROM cashflow_stream EMIT CHANGES
+    
